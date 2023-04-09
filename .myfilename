@@ -1,0 +1,1 @@
+export DATABASE_URL = postgres://spinnyapp_user:aN2BUCXILdRYCZwJ4yu2RCTrPINjDMZp@dpg-cgpac49euhlq285iv0g0-a.singapore-postgres.render.com/spinnyapp
