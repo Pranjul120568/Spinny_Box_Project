@@ -11,7 +11,6 @@ class User(AbstractUser):
     email = models.EmailField(
         ('email address'), max_length=254, unique=True, null=True, blank=True)
     password = models.CharField(max_length=30)
-    mobile_no = models.CharField(max_length=15)
     is_staff = models.BooleanField(
         ('staff status'),
         default=False,

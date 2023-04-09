@@ -6,7 +6,7 @@ from .models import User, box, room
 @admin.register(User)
 class user_admin(admin.ModelAdmin):
     list_display = ['id', 'username', 'email',
-                    'password', 'mobile_no', 'is_staff']
+                    'password', 'is_staff']
 
 
 @admin.register(room)

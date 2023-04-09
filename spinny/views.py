@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework import viewsets
-from .serializers import user_serializers, box_serializers, room_serializers
+from .serializers import user_serializers, box_serializers, room_serializers, box_not_staff_serializers
 from .models import User, room, box
 import datetime
 from rest_framework.views import APIView
@@ -11,6 +11,7 @@ from rest_framework.exceptions import AuthenticationFailed
 from django.contrib.auth.hashers import check_password
 from .authentication import is_logged_in
 from .dates import get_week
+from .filterboxes import filter_boxes
 
 # Create your views here.
 TOTAL_ROOM_AREA = 1000
@@ -23,21 +24,31 @@ MAXIMUM_BOXES_FOR_A_USER_IN_A_WEEK = 5
 #     queryset = User.objects.all()
 #     serializer_class = user_serializers
 
+class getbox(APIView):
+    def get(self, request, pk=None, format=None):
+        box_id = pk
+        box_data = box.objects.get(id=box_id)
+        serializer = box_serializers(box_data)
+        return Response(serializer.data)
+
 
 class box_request(APIView):
     def get(self, request, format=None):
+        queries = request.GET.dict()
         logged_in = is_logged_in(request)
         if not logged_in:
             raise AuthenticationFailed('Unauthenticated!')
         token = request.COOKIES.get('jwt')
         payload = jwt.decode(token, 'secret', algorithms=['HS256'])
         user_id = payload['id']
+        queryset = filter_boxes(queries=queries)
         if not payload['is_staff']:
-            queryset = box.objects.values('id', 'length', 'breadth', 'height',
-                                          'area', 'volume')
+            queryset = queryset.values('id', 'length', 'breadth', 'height',
+                                       'area', 'volume')
+            serializer = box_not_staff_serializers(queryset, many=True)
         else:
-            queryset = box.objects.all()
-        serializer = box_serializers(queryset, many=True)
+            serializer = box_serializers(queryset, many=True, partial=True)
+        print(serializer.data)
         return Response(serializer.data)
 
     def post(self, request, format=None):
@@ -165,7 +176,7 @@ class box_request(APIView):
         else:
             return Response({'msg': "Server Error!!"}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({'msg': "Box updated Successfully!!"}, status=status.HTTP_201_CREATED)
+        return Response({'msg': "Box updated Successfully!!", "data": updated_box_data}, status=status.HTTP_201_CREATED)
 
     def delete(self, request, id=None):
         logged_in = is_logged_in(request)
@@ -213,7 +224,7 @@ class box_request(APIView):
         else:
             return Response({'msg': "Server Error!!"}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({'msg': "Box deleted Successfully!!"}, status=status.HTTP_201_CREATED)
+        return Response({'msg': "Box deleted Successfully!!", "data": box_data}, status=status.HTTP_201_CREATED)
 
 
 class register_user(APIView):
@@ -236,6 +247,23 @@ class get_users(APIView):
             try:
                 user = User.objects.all()
                 serializer = user_serializers(user, many=True)
+                return Response(serializer.data)
+            except:
+                return Response({'msg': 'Could not fetch'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            raise AuthenticationFailed('Unauthenticated!')
+
+
+class getuser(APIView):
+    def get(self, request, format=None):
+        logged_in = is_logged_in(request)
+        if logged_in:
+            try:
+                token = request.COOKIES.get('jwt')
+                payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+                user_id = payload['id']
+                user = User.objects.get(email=user_id)
+                serializer = user_serializers(user)
                 return Response(serializer.data)
             except:
                 return Response({'msg': 'Could not fetch'}, status=status.HTTP_400_BAD_REQUEST)

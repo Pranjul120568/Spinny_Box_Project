@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from spinny import views
 from rest_framework.routers import DefaultRouter
-
+from django.urls import re_path
 # creating router
 # router = DefaultRouter()
 
@@ -26,11 +26,15 @@ from rest_framework.routers import DefaultRouter
 # router.register('user_api', views.UserModelViewSet, basename='user')
 urlpatterns = [
     path('admin/', admin.site.urls),
+    re_path('boxapi/', include('spinny.urls'))
     # path('', include(router.urls)),
-    path('register/', views.register_user.as_view()),
-    path('getusers/', views.get_users.as_view()),
-    path('login/', views.login_user.as_view()),
-    path('logout/', views.logout_user.as_view()),
-    path('box/', views.box_request.as_view()),
+    # path('register/', views.register_user.as_view()),
+    # path('getusers/', views.get_users.as_view()),
+    # path('getuser/', views.getuser.as_view()),
+    # path('login/', views.login_user.as_view()),
+    # path('logout/', views.logout_user.as_view()),
+    # path('box/', views.box_request.as_view()),
+    # path('getbox/<int:pk>', views.getbox.as_view()),
+
 
 ]
