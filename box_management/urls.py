@@ -19,22 +19,12 @@ from django.urls import path, include
 from spinny import views
 from rest_framework.routers import DefaultRouter
 from django.urls import re_path
-# creating router
-# router = DefaultRouter()
-
-# # Register studentviewset with router
-# router.register('user_api', views.UserModelViewSet, basename='user')
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 urlpatterns = [
     path('admin/', admin.site.urls),
     re_path('boxapi/', include('spinny.urls'))
-    # path('', include(router.urls)),
-    # path('register/', views.register_user.as_view()),
-    # path('getusers/', views.get_users.as_view()),
-    # path('getuser/', views.getuser.as_view()),
-    # path('login/', views.login_user.as_view()),
-    # path('logout/', views.logout_user.as_view()),
-    # path('box/', views.box_request.as_view()),
-    # path('getbox/<int:pk>', views.getbox.as_view()),
 
 
 ]
+
+urlpatterns += staticfiles_urlpatterns()
