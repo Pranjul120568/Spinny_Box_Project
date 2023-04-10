@@ -25,7 +25,7 @@ MAXIMUM_BOXES_FOR_A_USER_IN_A_WEEK = 5
 #     serializer_class = user_serializers
 
 class getbox(APIView):
-    def get(self, request, pk=None, format=None):
+    def post(self, request, pk=None, format=None):
         box_id = pk
         box_data = box.objects.get(id=box_id)
         serializer = box_serializers(box_data)
@@ -41,6 +41,7 @@ class box_request(APIView):
         token = request.COOKIES.get('jwt')
         payload = jwt.decode(token, 'secret', algorithms=['HS256'])
         user_id = payload['id']
+        print(request.headers)
         queryset = filter_boxes(queries=queries)
         if not payload['is_staff']:
             queryset = queryset.values('id', 'length', 'breadth', 'height',
@@ -48,7 +49,6 @@ class box_request(APIView):
             serializer = box_not_staff_serializers(queryset, many=True)
         else:
             serializer = box_serializers(queryset, many=True, partial=True)
-        print(serializer.data)
         return Response(serializer.data)
 
     def post(self, request, format=None):
