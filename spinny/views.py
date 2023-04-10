@@ -183,6 +183,8 @@ class box_request(APIView):
 
         return Response({'msg': "Box updated Successfully!!", "data": updated_box_data}, status=status.HTTP_201_CREATED)
 
+
+class delete_request(APIView):
     def delete(self, request, id=None):
         logged_in = is_logged_in(request)
         if not logged_in:
