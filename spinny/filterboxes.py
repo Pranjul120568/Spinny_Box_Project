@@ -4,6 +4,7 @@ from .serializers import box_serializers
 
 
 def filter_boxes(queries):
+    print(queries)
     boxes = box.objects.all()
     if queries.get('min_length') is not None:
         boxes = boxes.filter(length__gte=queries.get('min_length'))
@@ -29,7 +30,7 @@ def filter_boxes(queries):
         boxes = boxes.filter(created_on__gte=queries.get('min_date'))
     if queries.get('max_date') is not None:
         boxes = boxes.filter(created_on__lte=queries.get('max_date'))
-    if queries.get('email') is not None:
+    if queries.get('email') is not None and queries.get('email') != "":
         boxes = boxes.filter(creator=queries.get('email'))
 
     # max_length = queries.get('max_length')
