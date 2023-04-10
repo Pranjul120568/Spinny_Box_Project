@@ -187,8 +187,9 @@ class box_request(APIView):
         logged_in = is_logged_in(request)
         if not logged_in:
             raise AuthenticationFailed('Unauthenticated!')
+        print(request.data)
         try:
-            box_id = request.data.get('id')
+            box_id = id
         except:
             return Response({'msg': 'No id attached'}, status=status.HTTP_400_BAD_REQUEST)
         token = request.headers['Authorization'][7:]
@@ -231,7 +232,7 @@ class box_request(APIView):
         else:
             return Response({'msg': "Server Error!!"}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({'msg': "Box deleted Successfully!!", "data": box_data}, status=status.HTTP_201_CREATED)
+        return Response({'msg': "Box deleted Successfully!!"}, status=status.HTTP_201_CREATED)
 
 
 class register_user(APIView):
