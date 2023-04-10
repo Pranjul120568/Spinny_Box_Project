@@ -7,7 +7,10 @@ from .models import User
 
 
 def is_logged_in(request):
-    token = request.COOKIES.get('jwt')
+    token = request.headers['Authorization'][7:]
+    if token is None:
+        token = request.COOKIES.get('jwt')
+    print(token)
     if not token:
         return False
     try:

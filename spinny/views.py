@@ -38,10 +38,11 @@ class box_request(APIView):
         logged_in = is_logged_in(request)
         if not logged_in:
             raise AuthenticationFailed('Unauthenticated!')
-        token = request.COOKIES.get('jwt')
+        token = request.headers['Authorization'][7:]
+        if token is None:
+            token = request.COOKIES.get('jwt')
         payload = jwt.decode(token, 'secret', algorithms=['HS256'])
         user_id = payload['id']
-        print(request.headers)
         queryset = filter_boxes(queries=queries)
         if not payload['is_staff']:
             queryset = queryset.values('id', 'length', 'breadth', 'height',
@@ -56,7 +57,9 @@ class box_request(APIView):
         if not logged_in:
             raise AuthenticationFailed('Unauthenticated!')
 
-        token = request.COOKIES.get('jwt')
+        token = request.headers['Authorization'][7:]
+        if token is None:
+            token = request.COOKIES.get('jwt')
         payload = jwt.decode(token, 'secret', algorithms=['HS256'])
         user_id = payload['id']
         week = get_week()
@@ -113,7 +116,9 @@ class box_request(APIView):
         if not logged_in:
             raise AuthenticationFailed('Unauthenticated!')
 
-        token = request.COOKIES.get('jwt')
+        token = request.headers['Authorization'][7:]
+        if token is None:
+            token = request.COOKIES.get('jwt')
         payload = jwt.decode(token, 'secret', algorithms=['HS256'])
         user_id = payload['id']
         week = get_week()
@@ -186,7 +191,9 @@ class box_request(APIView):
             box_id = request.data.get('id')
         except:
             return Response({'msg': 'No id attached'}, status=status.HTTP_400_BAD_REQUEST)
-        token = request.COOKIES.get('jwt')
+        token = request.headers['Authorization'][7:]
+        if token is None:
+            token = request.COOKIES.get('jwt')
         payload = jwt.decode(token, 'secret', algorithms=['HS256'])
         user_id = payload['id']
         week = get_week()
@@ -259,7 +266,9 @@ class getuser(APIView):
         logged_in = is_logged_in(request)
         if logged_in:
             try:
-                token = request.COOKIES.get('jwt')
+                token = request.headers['Authorization'][7:]
+                if token is None:
+                    token = request.COOKIES.get('jwt')
                 payload = jwt.decode(token, 'secret', algorithms=['HS256'])
                 user_id = payload['id']
                 user = User.objects.get(email=user_id)
@@ -309,7 +318,9 @@ class login_user(APIView):
 class logout_user(APIView):
     def post(self, request):
         response = Response()
-        token = request.COOKIES.get('jwt')
+        token = request.headers['Authorization'][7:]
+        if token is None:
+            token = request.COOKIES.get('jwt')
         payload = jwt.decode(token, 'secret', algorithms=['HS256'])
         # print(payload)
         response.delete_cookie('jwt')
