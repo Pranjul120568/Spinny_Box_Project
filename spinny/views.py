@@ -26,6 +26,9 @@ MAXIMUM_BOXES_FOR_A_USER_IN_A_WEEK = 5
 
 class getbox(APIView):
     def post(self, request, pk=None, format=None):
+        logged_in = is_logged_in(request)
+        if not logged_in:
+            raise AuthenticationFailed('Unauthenticated!')
         box_id = pk
         box_data = box.objects.get(id=box_id)
         serializer = box_serializers(box_data)
@@ -52,6 +55,8 @@ class box_request(APIView):
             serializer = box_serializers(queryset, many=True, partial=True)
         return Response(serializer.data)
 
+
+class add_request(APIView):
     def post(self, request, format=None):
         logged_in = is_logged_in(request)
         if not logged_in:
@@ -111,6 +116,8 @@ class box_request(APIView):
 
         return Response({'msg': "Box saved Successfully!!", "data": box_data}, status=status.HTTP_201_CREATED)
 
+
+class update_request(APIView):
     def put(self, request, format=None):
         logged_in = is_logged_in(request)
         if not logged_in:
