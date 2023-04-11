@@ -251,10 +251,32 @@ class register_user(APIView):
         if password != confirm_password or confirm_password is None:
             return Response({'msg': 'Passwords do not match'}, status=status.HTTP_400_BAD_REQUEST)
         serializer = user_serializers(data=request.data)
+
         if serializer.is_valid():
             serializer.save()
-            return Response({'msg': 'User Created'}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors)
+        else:
+            return Response(serializer.errors)
+        try:
+            payload = {
+                'id': request.data['email'],
+                'is_staff': False,
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=7),
+                'iat': datetime.datetime.utcnow()
+            }
+            token = jwt.encode(payload, 'secret',
+                               algorithm='HS256')
+            # .decode('utf-8')
+            response = Response()
+            response.set_cookie(key='jwt', value=token, httponly=True)
+            response.data = {
+                'jwt': token,
+                'email': request.data['email'],
+                'is_staff': False
+
+            }
+            return response
+        except:
+            return Response({'msg': 'User data not valid!'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class get_users(APIView):
